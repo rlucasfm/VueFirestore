@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue JS</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+<body>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+        https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>        
+
+    <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyCPN5rlVdg1sBXEDZcxQEyVdDKpSDpd07k",
+        authDomain: "example-project-d3ec3.firebaseapp.com",
+        projectId: "example-project-d3ec3",
+        storageBucket: "example-project-d3ec3.appspot.com",
+        messagingSenderId: "765822925905",
+        appId: "1:765822925905:web:4724e8ecf61e6438a34c70",
+        measurementId: "G-5TT3C6SE85"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();        
+
+    var db = firebase.firestore()
+    </script>
+
+
+    <div id="teste">
+        <ol>
+            <li v-for='doc in documents'>
+                {{doc.name}}
+            </li>
+        </ol>
+    </div>    
+
+    <script>
+        let documents = []
+
+        db.collection("cities").onSnapshot((querySnapshot) => {
+            querySnapshot.docChanges().forEach((change) => {
+                if(change.type === "added") {
+                    documents.push(change.doc.data());
+                }else if(change.type === "modified") {
+                    documents.splice(documents.findIndex(function(obj){
+                        return obj.name === change.doc.data().name;
+                    }) , 1)
+                    documents.push(change.doc.data())                                                    
+                }else if(change.type === "removed") {
+                    documents.splice(documents.findIndex(function(obj){
+                        return obj.name === change.doc.data().name;
+                    }) , 1)
+                }
+                
+            })
+        })
+
+        let vm = new Vue({
+            el:'#teste',
+            data: {
+                documents: documents
+            }
+        })
+    </script>
+
+</body>
+</html>
